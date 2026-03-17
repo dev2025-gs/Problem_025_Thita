@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Merge Two Sorted Lists – Visualizer</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+      }
+
+      h1 {
+        margin-bottom: 5px;
+      }
+
+      input {
+        width: 400px;
+        padding: 8px;
+        font-size: 16px;
+      }
+
+      button {
+        padding: 8px 14px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-left: 8px;
+      }
+
+      #lists {
+        display: flex;
+        gap: 40px;
+        margin-top: 30px;
+      }
+
+      .list {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 60px;
+      }
+
+      .node {
+        width: 40px;
+        height: 40px;
+        background: steelblue;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 18px;
+        position: relative;
+      }
+
+      .node.left {
+        background: orange;
+      }
+
+      .node.right {
+        background: crimson;
+      }
+
+      .arrow {
+        font-size: 24px;
+        color: #333;
+        margin: 0 4px;
+      }
+
+      #merged {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 40px;
+        min-height: 60px;
+      }
+
+      #info {
+        margin-top: 20px;
+        font-size: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Merge Two Sorted Lists – Animation</h1>
+    <p>Enter two sorted arrays (comma separated):</p>
+
+    <input id="input1" value="1,2,4" />
+    <input id="input2" value="1,3,4" />
+    <button onclick="start()">Start Animation</button>
+    <button onclick="step()">Step</button>
+
+    <div id="lists">
+      <div>
+        <strong>List 1:</strong>
+        <div class="list" id="list1"></div>
+      </div>
+      <div>
+        <strong>List 2:</strong>
+        <div class="list" id="list2"></div>
+      </div>
+    </div>
+
+    <div>
+      <strong>Merged List:</strong>
+      <div id="merged"></div>
+    </div>
+
+    <div id="info"></div>
+
+    <script>
+      let arr1, arr2, i1, i2, merged, done;
+
+      function start() {
+        arr1 = document.getElementById("input1").value.split(",").map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+        arr2 = document.getElementById("input2").value.split(",").map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+        if (arr1.length === 0 || arr2.length === 0) {
+          alert("Both lists must have at least one number.");
+          return;
+        }
+        i1 = 0;
+        i2 = 0;
+        merged = [];
+        done = false;
+        draw();
+        document.getElementById("info").innerHTML = "Click 'Step' to merge step by step.";
+        document.getElementById("merged").innerHTML = "";
+      }
+
+      function step() {
+        if (done) return;
+        if (i1 < arr1.length && i2 < arr2.length) {
+          if (arr1[i1] <= arr2[i2]) {
+            merged.push(arr1[i1]);
+            i1++;
+          } else {
+            merged.push(arr2[i2]);
+            i2++;
+          }
+        } else if (i1 < arr1.length) {
+          merged.push(arr1[i1]);
+          i1++;
+        } else if (i2 < arr2.length) {
+          merged.push(arr2[i2]);
+          i2++;
+        } else {
+          done = true;
+          document.getElementById("info").innerHTML += "<br><strong>✅ Done!</strong>";
+        }
+        draw();
+      }
+
+      function draw() {
+        // Draw List 1
+        const list1Div = document.getElementById("list1");
+        list1Div.innerHTML = "";
+        arr1.forEach((val, idx) => {
+          const node = document.createElement("div");
+          node.className = "node";
+          if (idx === i1 && i1 < arr1.length && !done) node.classList.add("left");
+          node.textContent = val;
+          list1Div.appendChild(node);
+          if (idx < arr1.length - 1) {
+            const arrow = document.createElement("span");
+            arrow.className = "arrow";
+            arrow.textContent = "→";
+            list1Div.appendChild(arrow);
+          }
+        });
+
+        // Draw List 2
+        const list2Div = document.getElementById("list2");
+        list2Div.innerHTML = "";
+        arr2.forEach((val, idx) => {
+          const node = document.createElement("div");
+          node.className = "node";
+          if (idx === i2 && i2 < arr2.length && !done) node.classList.add("right");
+          node.textContent = val;
+          list2Div.appendChild(node);
+          if (idx < arr2.length - 1) {
+            const arrow = document.createElement("span");
+            arrow.className = "arrow";
+            arrow.textContent = "→";
+            list2Div.appendChild(arrow);
+          }
+        });
+
+        // Draw Merged List
+        const mergedDiv = document.getElementById("merged");
+        mergedDiv.innerHTML = "";
+        merged.forEach((val, idx) => {
+          const node = document.createElement("div");
+          node.className = "node";
+          node.style.background = "#4caf50";
+          node.textContent = val;
+          mergedDiv.appendChild(node);
+          if (idx < merged.length - 1) {
+            const arrow = document.createElement("span");
+            arrow.className = "arrow";
+            arrow.textContent = "→";
+            mergedDiv.appendChild(arrow);
+          }
+        });
+
+        // Info
+        document.getElementById("info").innerHTML =
+          `List1 index = ${i1}, List2 index = ${i2}<br>Next merge step: ` +
+          (!done ?
+            (i1 < arr1.length && i2 < arr2.length ?
+              (arr1[i1] <= arr2[i2] ? `Take ${arr1[i1]} from List 1` : `Take ${arr2[i2]} from List 2`) :
+              (i1 < arr1.length ? `Take ${arr1[i1]} from List 1` : `Take ${arr2[i2]} from List 2`)
+            ) : "All nodes merged!");
+      }
+    </script>
+  </body>
+</html>
